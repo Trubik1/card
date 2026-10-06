@@ -3,7 +3,7 @@
 // =============================================================================
 
 window.CARD_CONFIG = {
-  // Имя и заголовок (без эмодзи, чистый кибер-стиль)
+  // Имя и заголовок
   name: "Trubik",
   tagline: "ML Engineer & Fullstack Developer",
   bio: "Разработка систем компьютерного зрения, обучающих платформ с ИИ, Telegram-ботов и масштабируемых веб-приложений. Фокус на производительность и надёжность.",
@@ -86,18 +86,17 @@ window.CARD_CONFIG = {
     }
   ],
 
-  // 10 отобранных стикеров Ам Няма (стартовый #10)
+  // Только точные номера стикеров, которые указал пользователь (стартовый #10)
   stickers: [
-    { id: "amnumya-10", name: "Ам Няма #10", src: "assets/amnumya_010.webp" },
-    { id: "amnumya-05", name: "Ам Няма #5",  src: "assets/amnumya_005.webp" },
-    { id: "amnumya-19", name: "Ам Няма #19", src: "assets/amnumya_019.webp" },
-    { id: "amnumya-25", name: "Ам Няма #25", src: "assets/amnumya_025.webp" },
-    { id: "amnumya-30", name: "Ам Няма #30", src: "assets/amnumya_030.webp" },
-    { id: "amnumya-34", name: "Ам Няма #34", src: "assets/amnumya_034.webp" },
-    { id: "amnumya-40", name: "Ам Няма #40", src: "assets/amnumya_040.webp" },
-    { id: "amnumya-50", name: "Ам Няма #50", src: "assets/amnumya_050.webp" },
-    { id: "amnumya-71", name: "Ам Няма #71", src: "assets/amnumya_071.webp" },
-    { id: "amnumya-01", name: "Ам Няма #1",  src: "assets/amnumya_001.webp" }
+    { id: "amnumya-10", src: "assets/amnumya_010.webp" },
+    { id: "amnumya-71", src: "assets/amnumya_071.webp" },
+    { id: "amnumya-05", src: "assets/amnumya_005.webp" },
+    { id: "amnumya-19", src: "assets/amnumya_019.webp" },
+    { id: "amnumya-25", src: "assets/amnumya_025.webp" },
+    { id: "amnumya-30", src: "assets/amnumya_030.webp" },
+    { id: "amnumya-34", src: "assets/amnumya_034.webp" },
+    { id: "amnumya-40", src: "assets/amnumya_040.webp" },
+    { id: "amnumya-50", src: "assets/amnumya_050.webp" }
   ],
   defaultSticker: "amnumya-10",
   stickerAutoCycleSeconds: 4,
@@ -105,9 +104,9 @@ window.CARD_CONFIG = {
   // Настройки физики частиц фонового Canvas
   particles: {
     enabled: true,
-    gridDensity: 30,
+    gridDensity: 32,
     repulsionRadius: 110,
     particleColor: "rgba(255, 255, 255, 0.35)",
-    cursorLightColor: "rgba(78, 201, 176, 0.12)"
+    cursorLightColor: "rgba(52, 211, 153, 0.15)"
   }
 };

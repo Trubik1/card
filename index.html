@@ -12,46 +12,50 @@
 </head>
 <body>
 
-  <!-- Фоновые холсты: силовое поле частиц + рамки из убегающих пикселей-квадратиков -->
+  <!-- Фоновый интерактивный холст с физикой частиц (мышь, тач, волны на телефонах) -->
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
-  <canvas id="pixel-borders-canvas" aria-hidden="true"></canvas>
 
   <main class="page-container">
     
-    <!-- Минималистичная верхняя навигация по разделам -->
+    <!-- Навигация по схемам (Desktop) -->
     <header class="top-nav-bar">
       <nav class="nav-tabs" role="tablist">
-        <button class="nav-tab active" data-tab="profile" role="tab" aria-selected="true">
+        <a class="nav-tab active" href="#profile" data-target="profile">
           <span class="tab-num">01</span>
           <span class="tab-text" data-cipher>ПРОФИЛЬ</span>
-        </button>
-        <button class="nav-tab" data-tab="projects" role="tab" aria-selected="false">
+        </a>
+        <a class="nav-tab" href="#projects" data-target="projects">
           <span class="tab-num">02</span>
           <span class="tab-text" data-cipher>ПРОЕКТЫ</span>
-        </button>
-        <button class="nav-tab" data-tab="stack" role="tab" aria-selected="false">
+        </a>
+        <a class="nav-tab" href="#stack" data-target="stack">
           <span class="tab-num">03</span>
           <span class="tab-text" data-cipher>СТЕК</span>
-        </button>
+        </a>
       </nav>
     </header>
 
-    <!-- СЕКЦИЯ 1: ПРОФИЛЬ & КОНТАКТЫ -->
-    <section id="view-profile" class="tab-view active">
+    <!-- СХЕМА 01: ПРОФИЛЬ & КОНТАКТЫ -->
+    <section id="profile" class="schema-section">
+      <div class="schema-badge">
+        <span class="badge-num">SCHEMA // 01</span>
+        <span class="badge-label" data-cipher>ПЕРСОНАЛЬНЫЙ ПРОФИЛЬ</span>
+      </div>
+
       <div class="bento-grid profile-grid">
         
         <!-- Главная карточка с Ам Нямом и представлением -->
-        <div class="bento-card hero-card pixel-frame">
-          
-          <!-- Сцена со стикером (автосмена каждые 4 секунды) -->
+        <div class="bento-card hero-card cyber-frame">
+          <div class="corner-cross tl"></div>
+          <div class="corner-cross tr"></div>
+          <div class="corner-cross bl"></div>
+          <div class="corner-cross br"></div>
+
+          <!-- Сцена со стикером (автосмена каждые 4 сек, без лишних надписей и номеров) -->
           <div class="sticker-stage" id="sticker-stage" title="Кликните для мгновенной смены стикера">
             <div class="sticker-wrapper">
               <img id="sticker-img" class="sticker-img" src="assets/amnumya_010.webp" alt="Ам Няма" />
               <div class="sticker-shadow"></div>
-            </div>
-            <div class="sticker-hint">
-              <span class="auto-indicator">● auto</span>
-              <span id="sticker-hint-name" data-cipher>Ам Няма #10</span>
             </div>
           </div>
 
@@ -66,38 +70,27 @@
             </p>
           </div>
 
-          <!-- Кнопки связи -->
+          <!-- Кнопка Telegram (кнопка копирования ID удалена по запросу) -->
           <div class="hero-actions">
-            <!-- Личка Telegram -->
             <a id="btn-telegram" href="https://t.me/Trubik1" target="_blank" rel="noopener noreferrer" class="btn-telegram">
               <svg viewBox="0 0 24 24" width="20" height="20">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
               </svg>
               <span class="btn-text" data-cipher>Написать в Telegram</span>
             </a>
-
-            <!-- Копирование личного юзернейма в один клик -->
-            <div class="copy-pill" id="copy-pill" title="Скопировать юзернейм @Trubik1">
-              <div class="copy-pill-left">
-                <span class="copy-label">TG ID</span>
-                <span class="copy-value" id="copy-username">@Trubik1</span>
-              </div>
-              <div class="copy-btn-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-              </div>
-            </div>
           </div>
 
         </div>
 
-        <!-- Правая колонка: Канал, GitHub, Быстрый обзор -->
+        <!-- Правая колонка: Канал, GitHub, Быстрый статус -->
         <div class="bento-column">
           
           <!-- Карточка Telegram-канала -->
-          <a href="https://t.me/Trubik11" target="_blank" rel="noopener noreferrer" class="bento-card channel-card pixel-frame">
+          <a href="https://t.me/Trubik11" target="_blank" rel="noopener noreferrer" class="bento-card channel-card cyber-frame">
+            <div class="corner-cross tl"></div>
+            <div class="corner-cross tr"></div>
+            <div class="corner-cross bl"></div>
+            <div class="corner-cross br"></div>
             <div class="card-header-row">
               <span class="tag-badge">[CHANNEL]</span>
               <span class="arrow-indicator">↗</span>
@@ -107,7 +100,11 @@
           </a>
 
           <!-- Карточка GitHub -->
-          <a href="https://github.com/Trubik1" target="_blank" rel="noopener noreferrer" class="bento-card github-card pixel-frame">
+          <a href="https://github.com/Trubik1" target="_blank" rel="noopener noreferrer" class="bento-card github-card cyber-frame">
+            <div class="corner-cross tl"></div>
+            <div class="corner-cross tr"></div>
+            <div class="corner-cross bl"></div>
+            <div class="corner-cross br"></div>
             <div class="card-header-row">
               <span class="tag-badge">[GITHUB]</span>
               <span class="arrow-indicator">↗</span>
@@ -116,28 +113,32 @@
             <p class="github-desc" data-cipher>Репозитории, открытый исходный код, архитектура решений.</p>
           </a>
 
-          <!-- Быстрый переход к проектам -->
-          <div class="bento-card quick-nav-card pixel-frame" id="btn-quick-projects">
+          <!-- Быстрый скролл к проектам -->
+          <a href="#projects" class="bento-card quick-nav-card cyber-frame">
+            <div class="corner-cross tl"></div>
+            <div class="corner-cross tr"></div>
+            <div class="corner-cross bl"></div>
+            <div class="corner-cross br"></div>
             <div class="quick-nav-content">
               <div>
                 <span class="tag-badge">[PORTFOLIO]</span>
                 <h4 data-cipher>Смотреть проекты</h4>
                 <p>Connecto, CV микродетекция, ИИ-платформа, боты</p>
               </div>
-              <span class="arrow-indicator">→</span>
+              <span class="arrow-indicator">↓</span>
             </div>
-          </div>
+          </a>
 
         </div>
 
       </div>
     </section>
 
-    <!-- СЕКЦИЯ 2: ПРОЕКТЫ И КЕЙСЫ -->
-    <section id="view-projects" class="tab-view">
-      <div class="section-intro">
-        <span class="tag-badge">[SELECTED WORKS]</span>
-        <h2 class="section-heading" data-cipher>Ключевые проекты</h2>
+    <!-- СХЕМА 02: ПРОЕКТЫ И КЕЙСЫ -->
+    <section id="projects" class="schema-section">
+      <div class="schema-badge">
+        <span class="badge-num">SCHEMA // 02</span>
+        <span class="badge-label" data-cipher>ПРОЕКТЫ И РАЗРАБОТКА</span>
       </div>
 
       <div class="projects-grid" id="projects-grid">
@@ -145,11 +146,11 @@
       </div>
     </section>
 
-    <!-- СЕКЦИЯ 3: СТЕК И ТЕХНОЛОГИИ -->
-    <section id="view-stack" class="tab-view">
-      <div class="section-intro">
-        <span class="tag-badge">[TECH STACK]</span>
-        <h2 class="section-heading" data-cipher>Стек технологий</h2>
+    <!-- СХЕМА 03: СТЕК И ТЕХНОЛОГИИ -->
+    <section id="stack" class="schema-section">
+      <div class="schema-badge">
+        <span class="badge-num">SCHEMA // 03</span>
+        <span class="badge-label" data-cipher>ТЕХНОЛОГИЧЕСКИЙ СТЕК</span>
       </div>
 
       <div class="stack-grid" id="stack-grid">
@@ -161,39 +162,33 @@
 
   <!-- Мобильный плавающий док (Bottom Dock) для смартфонов -->
   <nav class="mobile-dock" aria-label="Мобильная навигация">
-    <button class="dock-btn active" data-tab="profile">
+    <a class="dock-btn active" href="#profile" data-target="profile">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
         <circle cx="12" cy="7" r="4"></circle>
       </svg>
       <span>Профиль</span>
-    </button>
-    <button class="dock-btn" data-tab="projects">
+    </a>
+    <a class="dock-btn" href="#projects" data-target="projects">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
       </svg>
       <span>Проекты</span>
-    </button>
-    <button class="dock-btn" data-tab="stack">
+    </a>
+    <a class="dock-btn" href="#stack" data-target="stack">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
         <polyline points="2 17 12 22 22 17"></polyline>
         <polyline points="2 12 12 17 22 12"></polyline>
       </svg>
       <span>Стек</span>
-    </button>
+    </a>
   </nav>
-
-  <!-- Toast при копировании контакта -->
-  <div class="toast-notice" id="toast-notice" role="status" aria-live="polite">
-    ✓ Скопировано: @Trubik1
-  </div>
 
   <!-- Подключение скриптов -->
   <script src="config.js"></script>
   <script src="particles.js"></script>
-  <script src="pixelBorders.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

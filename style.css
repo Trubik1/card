@@ -1,5 +1,5 @@
 /* =============================================================================
-   ДИЗАЙН-СИСТЕМА: TRUBIK CYBER BENTO (ANTI-SLOP ARCHITECTURE)
+   ДИЗАЙН-СИСТЕМА: TRUBIK CYBER BENTO & SCHEMA FLOW (ANTI-SLOP)
    Вдохновлено unibb.vercel.app & tier.guru/ecronx
    ============================================================================= */
 
@@ -8,9 +8,9 @@
 :root {
   --bg-deep: #08090c;
   --bg-surface: #0e1017;
-  --card-bg: rgba(16, 19, 26, 0.76);
+  --card-bg: rgba(16, 19, 26, 0.82);
   --card-bg-solid: #11131a;
-  --card-hover: rgba(22, 26, 36, 0.9);
+  --card-hover: rgba(22, 26, 36, 0.94);
   --card-sub: rgba(255, 255, 255, 0.035);
 
   --border: rgba(255, 255, 255, 0.09);
@@ -23,12 +23,12 @@
 
   --accent-green: #34d399;
   --accent-blue: #38bdf8;
-  --accent-glow: rgba(52, 211, 153, 0.22);
+  --accent-glow: rgba(52, 211, 153, 0.2);
 
   --font-main: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
 
-  --radius-xl: 28px;
+  --radius-xl: 26px;
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 8px;
@@ -46,7 +46,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 86px;
+}
+
+body {
   min-height: 100%;
   background-color: var(--bg-deep);
   color: var(--text-main);
@@ -63,22 +68,14 @@ html, body {
   color: #000000;
 }
 
-/* Холсты на фоне */
-#bg-canvas,
-#pixel-borders-canvas {
+/* Интерактивный Canvas фоновых частиц */
+#bg-canvas {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-}
-
-#bg-canvas {
   z-index: 0;
-}
-
-#pixel-borders-canvas {
-  z-index: 2; /* Рисует убегающие пиксели рамок поверх карточек */
+  pointer-events: none;
 }
 
 /* Главный контейнер */
@@ -89,42 +86,44 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(20px, 3.5vw, 40px) clamp(16px, 3vw, 32px);
-  padding-bottom: 90px; /* Отступ под мобильный док */
+  padding: clamp(16px, 3vw, 32px) clamp(16px, 3vw, 32px) 120px;
 }
 
-/* ВЕРХНЯЯ НАВИГАЦИЯ (TABS) */
+/* ВЕРХНЯЯ ПЛАВАЮЩАЯ НАВИГАЦИЯ (DESKTOP) */
 .top-nav-bar {
+  position: sticky;
+  top: 16px;
+  z-index: 50;
   width: 100%;
   max-width: 980px;
   display: flex;
   justify-content: center;
-  margin-bottom: clamp(20px, 3vh, 32px);
+  margin-bottom: clamp(24px, 4vh, 40px);
 }
 
 .nav-tabs {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(18, 21, 29, 0.85);
+  background: rgba(14, 17, 24, 0.88);
   border: 1px solid var(--border);
   padding: 6px;
   border-radius: var(--radius-pill);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .nav-tab {
+  text-decoration: none;
   background: transparent;
-  border: none;
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  padding: 8px 18px;
+  padding: 8px 20px;
   border-radius: var(--radius-pill);
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -154,67 +153,133 @@ html, body {
   opacity: 0.6;
 }
 
-/* Вкладки (Views) */
-.tab-view {
+/* РАЗДЕЛЫ-СХЕМЫ (SCHEMA SECTIONS) */
+.schema-section {
   width: 100%;
   max-width: 980px;
-  display: none;
-  animation: fadeInSlide 0.28s var(--ease-spring) forwards;
+  margin-bottom: clamp(52px, 8vh, 80px);
 }
 
-.tab-view.active {
-  display: block;
+.schema-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
 }
 
-@keyframes fadeInSlide {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.badge-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green);
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.06em;
+}
+
+.badge-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: 0.08em;
 }
 
 /* =============================================================================
-   СЕКЦИЯ 1: ПРОФИЛЬ (BENTO GRID)
+   КИБЕР-РАМКИ КАРТОЧЕК (ИДЕАЛЬНО ВЫВЕРЕННЫЕ УГЛЫ)
+   ============================================================================= */
+.cyber-frame {
+  position: relative;
+  border: 1px solid var(--border);
+  transition: border-color 0.25s, transform 0.25s var(--ease-spring), box-shadow 0.25s;
+}
+
+.cyber-frame:hover {
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.8), 0 0 25px -5px rgba(52, 211, 153, 0.1);
+}
+
+/* Угловые прицельные метки [+] */
+.corner-cross {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+.corner-cross.tl {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-green);
+  border-left: 2px solid var(--accent-green);
+  border-top-left-radius: 6px;
+}
+
+.corner-cross.tr {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid var(--accent-green);
+  border-right: 2px solid var(--accent-green);
+  border-top-right-radius: 6px;
+}
+
+.corner-cross.bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 2px solid var(--accent-green);
+  border-left: 2px solid var(--accent-green);
+  border-bottom-left-radius: 6px;
+}
+
+.corner-cross.br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-green);
+  border-right: 2px solid var(--accent-green);
+  border-bottom-right-radius: 6px;
+}
+
+.cyber-frame:hover .corner-cross {
+  opacity: 1;
+}
+
+/* =============================================================================
+   СХЕМА 01: ПРОФИЛЬ (BENTO GRID)
    ============================================================================= */
 .profile-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.25fr 1fr;
   gap: clamp(16px, 2.2vw, 24px);
   align-items: stretch;
 }
 
 .bento-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: clamp(24px, 3.5vw, 36px);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-card);
-  position: relative;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.25s, transform 0.25s var(--ease-spring);
 }
 
 .hero-card {
   justify-content: space-between;
 }
 
-/* Сцена со стикером (автосмена) */
+/* Сцена со стикером (чистый стикер без подписей) */
 .sticker-stage {
   position: relative;
   width: 100%;
   height: clamp(170px, 22vw, 210px);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 
@@ -232,7 +297,7 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.55));
   transition: transform 0.35s var(--ease-spring), opacity 0.2s;
   user-select: none;
   -webkit-user-drag: none;
@@ -262,23 +327,7 @@ html, body {
   50% { transform: scale(0.8); opacity: 0.3; }
 }
 
-.sticker-hint {
-  margin-top: 6px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-sub);
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.auto-indicator {
-  color: var(--accent-green);
-  opacity: 0.85;
-}
-
-/* Имя и роль */
+/* Имя и био */
 .profile-info {
   margin-top: auto;
 }
@@ -308,7 +357,7 @@ html, body {
   line-height: 1.6;
 }
 
-/* Кнопки действий */
+/* Кнопка Telegram */
 .hero-actions {
   display: flex;
   flex-direction: column;
@@ -321,7 +370,7 @@ html, body {
   color: #08090c;
   border: none;
   border-radius: var(--radius-lg);
-  padding: 15px 22px;
+  padding: 16px 24px;
   font-weight: 700;
   font-size: 15px;
   display: flex;
@@ -348,53 +397,6 @@ html, body {
   fill: currentColor;
 }
 
-.copy-pill {
-  background: var(--card-sub);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-lg);
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s var(--ease-spring);
-}
-
-.copy-pill:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--accent-green);
-  transform: translateY(-1px);
-}
-
-.copy-pill:active {
-  transform: scale(0.99);
-}
-
-.copy-label {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-sub);
-  letter-spacing: 0.05em;
-}
-
-.copy-value {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-main);
-  margin-left: 8px;
-}
-
-.copy-btn-icon {
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-}
-
-.copy-pill:hover .copy-btn-icon {
-  color: var(--accent-green);
-}
-
 /* Правая колонка профиля */
 .bento-column {
   display: flex;
@@ -414,7 +416,6 @@ html, body {
 .github-card:hover,
 .quick-nav-card:hover {
   transform: translateY(-2px);
-  border-color: var(--border-strong);
 }
 
 .card-header-row {
@@ -464,7 +465,6 @@ html, body {
 .quick-nav-card {
   cursor: pointer;
   background: rgba(52, 211, 153, 0.05);
-  border-color: rgba(52, 211, 153, 0.2);
 }
 
 .quick-nav-content {
@@ -486,19 +486,8 @@ html, body {
 }
 
 /* =============================================================================
-   СЕКЦИЯ 2: ПРОЕКТЫ & КЕЙСЫ
+   СХЕМА 02: ПРОЕКТЫ & КЕЙСЫ
    ============================================================================= */
-.section-intro {
-  margin-bottom: 22px;
-}
-
-.section-heading {
-  font-size: clamp(24px, 3.2vw, 34px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-top: 6px;
-}
-
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -507,7 +496,6 @@ html, body {
 
 .project-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
   display: flex;
@@ -516,12 +504,11 @@ html, body {
   min-height: 200px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: all 0.25s var(--ease-spring);
+  box-shadow: var(--shadow-card);
 }
 
 .project-card:hover {
   transform: translateY(-3px);
-  border-color: var(--border-strong);
   background: var(--card-hover);
 }
 
@@ -573,7 +560,7 @@ html, body {
 }
 
 /* =============================================================================
-   СЕКЦИЯ 3: СТЕК ТЕХНОЛОГИЙ
+   СХЕМА 03: СТЕК ТЕХНОЛОГИЙ
    ============================================================================= */
 .stack-grid {
   display: grid;
@@ -583,11 +570,11 @@ html, body {
 
 .stack-group-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-card);
 }
 
 .stack-group-title {
@@ -595,9 +582,6 @@ html, body {
   font-weight: 700;
   letter-spacing: -0.01em;
   margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   color: var(--text-main);
 }
 
@@ -646,8 +630,8 @@ html, body {
 }
 
 .dock-btn {
+  text-decoration: none;
   background: transparent;
-  border: none;
   color: var(--text-muted);
   padding: 8px 16px;
   border-radius: var(--radius-pill);
@@ -671,33 +655,6 @@ html, body {
   stroke: var(--accent-green);
 }
 
-/* Toast */
-.toast-notice {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(30px);
-  background: var(--card-bg-solid);
-  border: 1px solid var(--accent-green);
-  color: var(--text-main);
-  padding: 10px 20px;
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.25s var(--ease-spring);
-  z-index: 999;
-}
-
-.toast-notice.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
 /* =============================================================================
    АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
    ============================================================================= */
@@ -715,17 +672,17 @@ html, body {
   }
 
   .top-nav-bar {
-    display: none; /* На телефонах используется удобный нижний док */
+    display: none;
   }
 
   .page-container {
-    padding-bottom: 96px;
+    padding-bottom: 100px;
   }
 }
 
 @media (max-width: 480px) {
   .page-container {
-    padding: 14px 10px 96px;
+    padding: 14px 10px 100px;
   }
 
   .bento-card {

@@ -1,41 +1,33 @@
 // =============================================================================
-// TRUBIK PERSONAL CARD: ГЛАВНЫЙ ДВИЖОК V2.0
+// TRUBIK PERSONAL CARD: ГЛАВНЫЙ ДВИЖОК V2.1
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   const CONFIG = window.CARD_CONFIG || {};
 
-  // 1. Инициализация фонового силового поля частиц
+  // 1. Инициализация фонового силового поля частиц (мышь, тачи, волны)
   const bgCanvas = document.getElementById('bg-canvas');
   if (bgCanvas && window.ParticleField && CONFIG.particles?.enabled !== false) {
     new window.ParticleField(bgCanvas, {
-      spacing: CONFIG.particles?.gridDensity || 30,
+      spacing: CONFIG.particles?.gridDensity || 32,
       radius: CONFIG.particles?.repulsionRadius || 110
     });
   }
 
-  // 2. Рендеринг данных
+  // 2. Рендеринг данных (проекты, стек, био)
   renderAllData(CONFIG);
 
-  // 3. Инициализация движка рамок из убегающих квадратиков
-  const bordersCanvas = document.getElementById('pixel-borders-canvas');
-  let pixelBorders = null;
-  if (bordersCanvas && window.PixelBorderEngine) {
-    pixelBorders = new window.PixelBorderEngine(bordersCanvas);
-    window.pixelBorderEngine = pixelBorders;
-  }
-
-  // 4. Глобальный эффект дешифровки текста (Scramble Cipher)
+  // 3. Глобальный эффект дешифровки текста (Scramble Cipher)
   runGlobalCipherCascade();
 
-  // 5. Автосмена стикеров каждые 4 секунды
+  // 4. Автосмена выбранных стикеров (стартовый #10, каждые 4 сек)
   initStickerAutoCycle(CONFIG);
 
-  // 6. Навигация по вкладкам (Desktop + Mobile Dock)
-  initTabNavigation();
+  // 5. Навигация и скролл-шпион по схемам (Desktop + Mobile Dock)
+  initScrollNavigation();
 
-  // 7. Копирование юзернейма @Trubik1 с Toast
-  initCopyHandler(CONFIG);
+  // 6. Интерактивный свет курсора на карточках (Spotlight effect)
+  initCardSpotlights();
 });
 
 // РЕНДЕРИНГ ДАННЫХ
@@ -50,20 +42,21 @@ function renderAllData(CONFIG) {
   const bioEl = document.getElementById('profile-bio');
   if (bioEl && CONFIG.bio) bioEl.textContent = CONFIG.bio;
 
-  // Telegram кнопки
+  // Telegram кнопка
   const tgBtn = document.getElementById('btn-telegram');
   if (tgBtn && CONFIG.telegram) {
     tgBtn.href = CONFIG.telegram.url;
   }
 
-  const copyVal = document.getElementById('copy-username');
-  if (copyVal && CONFIG.telegram) copyVal.textContent = CONFIG.telegram.username;
-
-  // Рендеринг проектов (Section 2)
+  // Рендеринг проектов (Схема 02)
   const projectsGrid = document.getElementById('projects-grid');
   if (projectsGrid && CONFIG.projects) {
     projectsGrid.innerHTML = CONFIG.projects.map(p => `
-      <div class="project-card pixel-frame">
+      <div class="project-card cyber-frame">
+        <div class="corner-cross tl"></div>
+        <div class="corner-cross tr"></div>
+        <div class="corner-cross bl"></div>
+        <div class="corner-cross br"></div>
         <div>
           <div class="project-card-header">
             <span class="tag-badge">[${escapeHtml(p.tag)}]</span>
@@ -80,11 +73,15 @@ function renderAllData(CONFIG) {
     `).join('');
   }
 
-  // Рендеринг стека технологий (Section 3)
+  // Рендеринг стека технологий (Схема 03)
   const stackGrid = document.getElementById('stack-grid');
   if (stackGrid && CONFIG.skillGroups) {
     stackGrid.innerHTML = CONFIG.skillGroups.map(g => `
-      <div class="stack-group-card pixel-frame">
+      <div class="stack-group-card cyber-frame">
+        <div class="corner-cross tl"></div>
+        <div class="corner-cross tr"></div>
+        <div class="corner-cross bl"></div>
+        <div class="corner-cross br"></div>
         <h3 class="stack-group-title" data-cipher>${escapeHtml(g.title)}</h3>
         <div class="stack-tags">
           ${g.skills.map(s => `<span class="tech-tag" data-cipher>${escapeHtml(s)}</span>`).join('')}
@@ -138,7 +135,7 @@ function scrambleElement(el, delay = 0) {
 function runGlobalCipherCascade(container = document) {
   const targets = container.querySelectorAll('[data-cipher]');
   targets.forEach((el, index) => {
-    const delay = 80 + index * 40;
+    const delay = 80 + index * 35;
     scrambleElement(el, delay);
   });
 
@@ -148,11 +145,10 @@ function runGlobalCipherCascade(container = document) {
   });
 }
 
-// АВТОСМЕНА СТИКЕРОВ АМ НЯМА (10 СТИКЕРОВ)
+// АВТОСМЕНА СТИКЕРОВ АМ НЯМА (БЕЗ ПОДПИСЕЙ И НОМЕРОВ)
 function initStickerAutoCycle(CONFIG) {
   const stage = document.getElementById('sticker-stage');
   const imgEl = document.getElementById('sticker-img');
-  const hintName = document.getElementById('sticker-hint-name');
   if (!imgEl || !CONFIG.stickers?.length) return;
 
   const stickers = CONFIG.stickers;
@@ -166,17 +162,13 @@ function initStickerAutoCycle(CONFIG) {
 
     setTimeout(() => {
       imgEl.src = s.src;
-      imgEl.alt = s.name;
-      if (hintName) {
-        hintName.textContent = s.name;
-        scrambleElement(hintName, 0);
-      }
+      imgEl.alt = 'Ам Няма';
       imgEl.style.transform = 'scale(1) rotate(0deg)';
       imgEl.style.opacity = '1';
     }, 140);
   }
 
-  // Запуск начального стикера
+  // Установка стартового стикера #10
   setSticker(currentIndex);
 
   function nextSticker() {
@@ -202,89 +194,70 @@ function initStickerAutoCycle(CONFIG) {
   }
 }
 
-// НАВИГАЦИЯ ПО ВКЛАДКАМ (DESKTOP + MOBILE DOCK)
-function initTabNavigation() {
+// СКРОЛЛ-НАВИГАЦИЯ И АКТИВНЫЕ РАЗДЕЛЫ (SCROLL SPY)
+function initScrollNavigation() {
   const navTabs = document.querySelectorAll('.nav-tab');
   const dockBtns = document.querySelectorAll('.dock-btn');
-  const views = document.querySelectorAll('.tab-view');
-  const quickBtn = document.getElementById('btn-quick-projects');
+  const sections = document.querySelectorAll('.schema-section');
 
-  function switchTab(tabId) {
-    // 1. Обновляем табы десктопа
+  function updateActiveNav(activeId) {
     navTabs.forEach(t => {
-      const active = t.getAttribute('data-tab') === tabId;
-      t.classList.toggle('active', active);
-      t.setAttribute('aria-selected', active);
+      t.classList.toggle('active', t.getAttribute('data-target') === activeId);
     });
-
-    // 2. Обновляем мобильный док
     dockBtns.forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
+      b.classList.toggle('active', b.getAttribute('data-target') === activeId);
     });
-
-    // 3. Переключаем видимость экранов
-    views.forEach(v => {
-      const active = v.id === `view-${tabId}`;
-      v.classList.toggle('active', active);
-      if (active) {
-        runGlobalCipherCascade(v);
-      }
-    });
-
-    // 4. Перестраиваем рамки из квадратиков под новую геометрию
-    if (window.pixelBorderEngine) {
-      setTimeout(() => window.pixelBorderEngine.rebuildBorders(), 60);
-    }
-
-    // Скролл наверх
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  navTabs.forEach(t => {
-    t.addEventListener('click', () => switchTab(t.getAttribute('data-tab')));
-  });
+  // Плавный скролл по клику
+  function bindSmoothScroll(elements) {
+    elements.forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = el.getAttribute('data-target');
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+          updateActiveNav(targetId);
+        }
+      });
+    });
+  }
 
-  dockBtns.forEach(b => {
-    b.addEventListener('click', () => switchTab(b.getAttribute('data-tab')));
-  });
+  bindSmoothScroll(navTabs);
+  bindSmoothScroll(dockBtns);
 
-  if (quickBtn) {
-    quickBtn.addEventListener('click', () => switchTab('projects'));
+  // Скролл-шпион через IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          updateActiveNav(entry.target.id);
+        }
+      });
+    }, {
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(s => observer.observe(s));
   }
 }
 
-// КОПИРОВАНИЕ ЮЗЕРНЕЙМА
-function initCopyHandler(CONFIG) {
-  const copyBtn = document.getElementById('copy-pill');
-  const toast = document.getElementById('toast-notice');
-  if (!copyBtn) return;
+// SPOTLIGHT МИКРО-СВЕЧЕНИЕ НА КАРТОЧКАХ
+function initCardSpotlights() {
+  if (window.matchMedia('(hover: none)').matches) return;
 
-  copyBtn.addEventListener('click', async () => {
-    const username = CONFIG.telegram?.username || '@Trubik1';
-    try {
-      await navigator.clipboard.writeText(username);
-      showToast(`✓ Скопировано: ${username}`);
-    } catch (err) {
-      const input = document.createElement('input');
-      input.value = username;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
-      showToast(`✓ Скопировано: ${username}`);
-    }
+  const cards = document.querySelectorAll('.cyber-frame');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--spot-x', `${x}px`);
+      card.style.setProperty('--spot-y', `${y}px`);
+    });
   });
-
-  let toastTimer = null;
-  function showToast(text) {
-    if (!toast) return;
-    toast.textContent = text;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2400);
-  }
 }
 
 // Защита от XSS
