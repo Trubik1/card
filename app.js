@@ -164,16 +164,32 @@ function initStickerAutoCycle(CONFIG) {
   let currentIndex = stickers.findIndex(s => s.id === CONFIG.defaultSticker);
   if (currentIndex === -1) currentIndex = 0;
 
+  const eyesOverlay = document.getElementById('omnom-eyes');
+
   function setSticker(index) {
     const s = stickers[index];
     imgEl.style.transform = 'scale(0.85) rotate(-6deg)';
     imgEl.style.opacity = '0.35';
+    if (eyesOverlay) {
+      eyesOverlay.style.opacity = '0';
+    }
 
     setTimeout(() => {
       imgEl.src = s.src;
       imgEl.alt = 'Ам Няма';
       imgEl.style.transform = 'scale(1) rotate(0deg)';
       imgEl.style.opacity = '1';
+      
+      // Живые анимированные глаза накладываем на стикер #10 (где он смотрит прямо)
+      if (eyesOverlay) {
+        if (s.id === 10) {
+          eyesOverlay.classList.remove('hidden');
+          eyesOverlay.style.opacity = '1';
+        } else {
+          eyesOverlay.classList.add('hidden');
+          eyesOverlay.style.opacity = '0';
+        }
+      }
     }, 140);
   }
 
@@ -296,33 +312,71 @@ function init3DTiltAndSpotlights() {
   });
 }
 
-// ИНТЕРАКТИВНЫЙ ОМ НЯМ: ПАРАЛЛАКС ЗА КУРСОРОМ И SQUISH ПРИ КЛИКЕ
+// ИНТЕРАКТИВНЫЙ ОМ НЯМ: ГЛОБАЛЬНЫЙ ТРЕКИНГ ЗРАЧКОВ (EYE TRACKING) + SQUISH
 function initInteractiveOmNom() {
   const stage = document.getElementById('sticker-stage');
   const img = document.getElementById('sticker-img');
+  const pupils = document.querySelectorAll('.omnom-pupil');
+  const eyesOverlay = document.getElementById('omnom-eyes');
+  const shadow = document.getElementById('sticker-shadow');
   if (!stage || !img) return;
 
-  // Слежение за курсором мыши
+  // Глобальное слежение за курсором мыши по всему экрану
   if (!window.matchMedia('(hover: none)').matches) {
-    stage.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', (e) => {
       const rect = stage.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // Мягкий поворот и смещение к курсору
-      img.style.transform = `translate3d(${x * 14}px, ${y * 14}px, 0) rotate(${x * 8}deg)`;
+      const stageCenterX = rect.left + rect.width / 2;
+      const stageCenterY = rect.top + rect.height / 2;
+
+      // Вектор от центра Ам Няма до курсора
+      const dx = e.clientX - stageCenterX;
+      const dy = e.clientY - stageCenterY;
+      const dist = Math.hypot(dx, dy);
+
+      // 1. Поворот и наклон тела Ам Няма в направлении курсора
+      const maxAngle = 14;
+      const angleX = Math.max(-maxAngle, Math.min(maxAngle, (dx / window.innerWidth) * 28));
+      const angleY = Math.max(-10, Math.min(10, (dy / window.innerHeight) * 16));
+      img.style.transform = `perspective(600px) rotateY(${angleX.toFixed(1)}deg) rotateX(${-angleY.toFixed(1)}deg)`;
+
+      // 2. Движение зрачков внутри глазниц (макс радиус движения 10px)
+      const maxPupilMove = 10;
+      const pRatio = Math.min(1, dist / 400);
+      const angleRad = Math.atan2(dy, dx);
+      const pupilX = Math.cos(angleRad) * maxPupilMove * pRatio;
+      const pupilY = Math.sin(angleRad) * maxPupilMove * pRatio;
+
+      pupils.forEach(pupil => {
+        // Эффект расширения зрачков при приближении курсора (любопытство)
+        const scale = dist < 220 ? 1.25 : 1.0;
+        pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0) scale(${scale})`;
+      });
+
+      // 3. Смещение тени в противоположную сторону от наклона
+      if (shadow) {
+        shadow.style.transform = `translate3d(${-angleX * 1.2}px, 0, 0) scale(${1 - Math.abs(angleX) * 0.01})`;
+      }
     });
 
-    stage.addEventListener('mouseleave', () => {
-      img.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+    // Плавный возврат в центр при уходе мыши с окна
+    window.addEventListener('mouseleave', () => {
+      img.style.transform = 'perspective(600px) rotateY(0deg) rotateX(0deg)';
+      pupils.forEach(p => {
+        p.style.transform = 'translate3d(0, 0, 0) scale(1)';
+      });
+      if (shadow) shadow.style.transform = 'translate3d(0, 0, 0) scale(1)';
     });
   }
 
   // При клике: смачный пружинистый squish + микровибрация
   stage.addEventListener('click', () => {
     img.classList.remove('squish');
+    if (eyesOverlay) eyesOverlay.classList.remove('squish');
+    
     // Force reflow
     void img.offsetWidth;
     img.classList.add('squish');
+    if (eyesOverlay) eyesOverlay.classList.add('squish');
 
     if (navigator.vibrate) {
       navigator.vibrate(15);

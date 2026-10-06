@@ -77,9 +77,18 @@
 
           <!-- Сцена со стикером (автосмена каждые 4 сек, без лишних надписей и номеров) -->
           <div class="sticker-stage" id="sticker-stage" title="Кликните для мгновенной смены стикера">
-            <div class="sticker-wrapper">
+            <div class="sticker-wrapper" id="sticker-wrapper">
               <img id="sticker-img" class="sticker-img" src="assets/amnumya_010.webp" alt="Ам Няма" />
-              <div class="sticker-shadow"></div>
+              <!-- Интерактивные живые зрачки для стикера #10 (следящие за курсором) -->
+              <div class="omnom-eyes-overlay" id="omnom-eyes" aria-hidden="true">
+                <div class="omnom-eye left-eye">
+                  <div class="omnom-pupil"></div>
+                </div>
+                <div class="omnom-eye right-eye">
+                  <div class="omnom-pupil"></div>
+                </div>
+              </div>
+              <div class="sticker-shadow" id="sticker-shadow"></div>
             </div>
           </div>
 
