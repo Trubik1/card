@@ -100,7 +100,8 @@ function scrambleElement(el, delay = 0) {
 
   setTimeout(() => {
     const startTime = performance.now();
-    const duration = Math.min(600, 200 + original.length * 20);
+    // Увеличенная длительность: дает глазу успеть насладиться эффектом
+    const duration = Math.max(650, 400 + original.length * 28);
 
     function tick(now) {
       const progress = Math.min((now - startTime) / duration, 1);
@@ -112,7 +113,8 @@ function scrambleElement(el, delay = 0) {
           text += original[i];
         } else if (i < charsSolved) {
           text += original[i];
-        } else if (i < charsSolved + 3) {
+        } else if (i < charsSolved + 4) {
+          // Окно активной бегущей дешифровки
           text += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
         } else {
           text += ' ';
@@ -135,7 +137,8 @@ function scrambleElement(el, delay = 0) {
 function runGlobalCipherCascade(container = document) {
   const targets = container.querySelectorAll('[data-cipher]');
   targets.forEach((el, index) => {
-    const delay = 80 + index * 35;
+    // Каскад с комфортными интервалами
+    const delay = 120 + index * 90;
     scrambleElement(el, delay);
   });
 
