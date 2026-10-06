@@ -26,8 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. Навигация и скролл-шпион по схемам (Desktop + Mobile Dock)
   initScrollNavigation();
 
-  // 6. Интерактивный свет курсора на карточках (Spotlight effect)
-  initCardSpotlights();
+  // 6. Интерактивный 3D-Tilt наклон карточек со световым бликом (Spotlight)
+  init3DTiltAndSpotlights();
+
+  // 7. Интерактивный Ом Ням: слежение за курсором и упругий Squish
+  initInteractiveOmNom();
+
+  // 8. Cyber HUD: живые часы UTC+3 и реальный счётчик FPS
+  initCyberHud();
 });
 
 // РЕНДЕРИНГ ДАННЫХ
@@ -247,20 +253,119 @@ function initScrollNavigation() {
   }
 }
 
-// SPOTLIGHT МИКРО-СВЕЧЕНИЕ НА КАРТОЧКАХ
-function initCardSpotlights() {
+// ИНТЕРАКТИВНЫЙ 3D-TILT И ДИНАМИЧЕСКИЙ БЛИК SPOTLIGHT
+function init3DTiltAndSpotlights() {
   if (window.matchMedia('(hover: none)').matches) return;
 
   const cards = document.querySelectorAll('.cyber-frame');
   cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--spot-x', `${x}px`);
-      card.style.setProperty('--spot-y', `${y}px`);
-    });
+    let bounds;
+
+    function onMouseEnter() {
+      bounds = card.getBoundingClientRect();
+    }
+
+    function onMouseMove(e) {
+      if (!bounds) bounds = card.getBoundingClientRect();
+      const mouseX = e.clientX - bounds.left;
+      const mouseY = e.clientY - bounds.top;
+
+      // Позиция для радиального светового пятна
+      card.style.setProperty('--mouse-x', `${mouseX}px`);
+      card.style.setProperty('--mouse-y', `${mouseY}px`);
+
+      // 3D Tilt физика: вычисляем угол наклона (от -4.5deg до +4.5deg)
+      const centerX = bounds.width / 2;
+      const centerY = bounds.height / 2;
+      const rotateX = ((mouseY - centerY) / centerY) * -4.5;
+      const rotateY = ((mouseX - centerX) / centerX) * 4.5;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+    }
+
+    function onMouseLeave() {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+      card.style.setProperty('--mouse-x', `-500px`);
+      card.style.setProperty('--mouse-y', `-500px`);
+      bounds = null;
+    }
+
+    card.addEventListener('mouseenter', onMouseEnter);
+    card.addEventListener('mousemove', onMouseMove);
+    card.addEventListener('mouseleave', onMouseLeave);
   });
+}
+
+// ИНТЕРАКТИВНЫЙ ОМ НЯМ: ПАРАЛЛАКС ЗА КУРСОРОМ И SQUISH ПРИ КЛИКЕ
+function initInteractiveOmNom() {
+  const stage = document.getElementById('sticker-stage');
+  const img = document.getElementById('sticker-img');
+  if (!stage || !img) return;
+
+  // Слежение за курсором мыши
+  if (!window.matchMedia('(hover: none)').matches) {
+    stage.addEventListener('mousemove', (e) => {
+      const rect = stage.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      // Мягкий поворот и смещение к курсору
+      img.style.transform = `translate3d(${x * 14}px, ${y * 14}px, 0) rotate(${x * 8}deg)`;
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      img.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+    });
+  }
+
+  // При клике: смачный пружинистый squish + микровибрация
+  stage.addEventListener('click', () => {
+    img.classList.remove('squish');
+    // Force reflow
+    void img.offsetWidth;
+    img.classList.add('squish');
+
+    if (navigator.vibrate) {
+      navigator.vibrate(15);
+    }
+  });
+}
+
+// CYBER HUD: ЖИВЫЕ ЧАСЫ UTC+3 И СЧЁТЧИК FPS
+function initCyberHud() {
+  const clockEl = document.getElementById('hud-clock');
+  const fpsEl = document.getElementById('hud-fps');
+
+  // Живые часы UTC+3
+  function updateTime() {
+    if (!clockEl) return;
+    const now = new Date();
+    // UTC+3 смещение
+    const utcHours = now.getUTCHours() + 3;
+    const hours = (utcHours % 24).toString().padStart(2, '0');
+    const minutes = now.getUTCMinutes().toString().padStart(2, '0');
+    clockEl.textContent = `UTC+3 ${hours}:${minutes}`;
+  }
+
+  updateTime();
+  setInterval(updateTime, 10000);
+
+  // Счётчик реального FPS
+  if (fpsEl) {
+    let frameCount = 0;
+    let lastTime = performance.now();
+
+    function fpsLoop(now) {
+      frameCount++;
+      if (now - lastTime >= 1000) {
+        const fps = Math.round((frameCount * 1000) / (now - lastTime));
+        fpsEl.textContent = `${Math.min(fps, 120)}`;
+        frameCount = 0;
+        lastTime = now;
+      }
+      requestAnimationFrame(fpsLoop);
+    }
+    requestAnimationFrame(fpsLoop);
+  }
 }
 
 // Защита от XSS

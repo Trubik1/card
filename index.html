@@ -17,6 +17,30 @@
 
   <main class="page-container">
     
+    <!-- КИБЕР-HUD СТРОКА СТАТУСА (SYS ONLINE / PING / UTC / PROJECTS) -->
+    <div class="cyber-hud-bar">
+      <div class="hud-item hud-status">
+        <span class="hud-pulse-dot"></span>
+        <span class="hud-label">SYS //</span>
+        <span class="hud-val" data-cipher>ONLINE</span>
+      </div>
+      <div class="hud-separator">/</div>
+      <div class="hud-item">
+        <span class="hud-label">TZ //</span>
+        <span class="hud-val" id="hud-clock">UTC+3 22:30</span>
+      </div>
+      <div class="hud-separator">/</div>
+      <div class="hud-item">
+        <span class="hud-label">MODE //</span>
+        <span class="hud-val text-green" data-cipher>OPEN FOR PROJECTS</span>
+      </div>
+      <div class="hud-separator">/</div>
+      <div class="hud-item hud-fps">
+        <span class="hud-label">FPS //</span>
+        <span class="hud-val" id="hud-fps">60</span>
+      </div>
+    </div>
+
     <!-- Навигация по схемам (Desktop) -->
     <header class="top-nav-bar">
       <nav class="nav-tabs" role="tablist">
