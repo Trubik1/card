@@ -31,9 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 7. Интерактивный Ом Ням: слежение за курсором и упругий Squish
   initInteractiveOmNom();
-
-  // 8. Cyber HUD: живые часы UTC+3 и реальный счётчик FPS
-  initCyberHud();
 });
 
 // РЕНДЕРИНГ ДАННЫХ
@@ -72,7 +69,7 @@ function renderAllData(CONFIG) {
           <p class="project-body">${escapeHtml(p.desc)}</p>
         </div>
         <div class="project-footer">
-          <span class="project-status-tag">STATUS: ACTIVE</span>
+          <span class="project-tag-hint">${escapeHtml(p.category)}</span>
           <span class="arrow-indicator">↗</span>
         </div>
       </div>

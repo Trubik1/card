@@ -17,53 +17,25 @@
 
   <main class="page-container">
     
-    <!-- КИБЕР-HUD СТРОКА СТАТУСА (SYS ONLINE / PING / UTC / PROJECTS) -->
-    <div class="cyber-hud-bar">
-      <div class="hud-item hud-status">
-        <span class="hud-pulse-dot"></span>
-        <span class="hud-label">SYS //</span>
-        <span class="hud-val" data-cipher>ONLINE</span>
-      </div>
-      <div class="hud-separator">/</div>
-      <div class="hud-item">
-        <span class="hud-label">TZ //</span>
-        <span class="hud-val" id="hud-clock">UTC+3 22:30</span>
-      </div>
-      <div class="hud-separator">/</div>
-      <div class="hud-item">
-        <span class="hud-label">MODE //</span>
-        <span class="hud-val text-green" data-cipher>OPEN FOR PROJECTS</span>
-      </div>
-      <div class="hud-separator">/</div>
-      <div class="hud-item hud-fps">
-        <span class="hud-label">FPS //</span>
-        <span class="hud-val" id="hud-fps">60</span>
-      </div>
-    </div>
-
-    <!-- Навигация по схемам (Desktop) -->
+    <!-- Навигация (Desktop) -->
     <header class="top-nav-bar">
       <nav class="nav-tabs" role="tablist">
         <a class="nav-tab active" href="#profile" data-target="profile">
-          <span class="tab-num">01</span>
           <span class="tab-text" data-cipher>ПРОФИЛЬ</span>
         </a>
         <a class="nav-tab" href="#projects" data-target="projects">
-          <span class="tab-num">02</span>
           <span class="tab-text" data-cipher>ПРОЕКТЫ</span>
         </a>
         <a class="nav-tab" href="#stack" data-target="stack">
-          <span class="tab-num">03</span>
           <span class="tab-text" data-cipher>СТЕК</span>
         </a>
       </nav>
     </header>
 
-    <!-- СХЕМА 01: ПРОФИЛЬ & КОНТАКТЫ -->
+    <!-- РАЗДЕЛ: ПРОФИЛЬ -->
     <section id="profile" class="schema-section">
-      <div class="schema-badge">
-        <span class="badge-num">SCHEMA // 01</span>
-        <span class="badge-label" data-cipher>ПЕРСОНАЛЬНЫЙ ПРОФИЛЬ</span>
+      <div class="section-title-wrap">
+        <h2 class="section-clean-title" data-cipher>ПРОФИЛЬ</h2>
       </div>
 
       <div class="bento-grid profile-grid">
@@ -110,7 +82,7 @@
             </p>
           </div>
 
-          <!-- Кнопка Telegram (кнопка копирования ID удалена по запросу) -->
+          <!-- Кнопка Telegram -->
           <div class="hero-actions">
             <a id="btn-telegram" href="https://t.me/Trubik1" target="_blank" rel="noopener noreferrer" class="btn-telegram">
               <svg viewBox="0 0 24 24" width="20" height="20">
@@ -132,10 +104,9 @@
             <div class="corner-cross bl"></div>
             <div class="corner-cross br"></div>
             <div class="card-header-row">
-              <span class="tag-badge">[CHANNEL]</span>
+              <h3 class="channel-title" data-cipher>@Trubik11</h3>
               <span class="arrow-indicator">↗</span>
             </div>
-            <h3 class="channel-title" data-cipher>@Trubik11</h3>
             <p class="channel-desc" data-cipher>Официальный канал: кейсы, новости разработки, апдейты проектов и инсайты.</p>
           </a>
 
@@ -146,10 +117,9 @@
             <div class="corner-cross bl"></div>
             <div class="corner-cross br"></div>
             <div class="card-header-row">
-              <span class="tag-badge">[GITHUB]</span>
+              <h3 class="github-title" data-cipher>github.com/Trubik1</h3>
               <span class="arrow-indicator">↗</span>
             </div>
-            <h3 class="github-title" data-cipher>github.com/Trubik1</h3>
             <p class="github-desc" data-cipher>Репозитории, открытый исходный код, архитектура решений.</p>
           </a>
 
@@ -161,7 +131,6 @@
             <div class="corner-cross br"></div>
             <div class="quick-nav-content">
               <div>
-                <span class="tag-badge">[PORTFOLIO]</span>
                 <h4 data-cipher>Смотреть проекты</h4>
                 <p>Connecto, CV микродетекция, ИИ-платформа, боты</p>
               </div>
@@ -174,11 +143,10 @@
       </div>
     </section>
 
-    <!-- СХЕМА 02: ПРОЕКТЫ И КЕЙСЫ -->
+    <!-- РАЗДЕЛ: ПРОЕКТЫ -->
     <section id="projects" class="schema-section">
-      <div class="schema-badge">
-        <span class="badge-num">SCHEMA // 02</span>
-        <span class="badge-label" data-cipher>ПРОЕКТЫ И РАЗРАБОТКА</span>
+      <div class="section-title-wrap">
+        <h2 class="section-clean-title" data-cipher>ПРОЕКТЫ</h2>
       </div>
 
       <div class="projects-grid" id="projects-grid">
@@ -186,11 +154,10 @@
       </div>
     </section>
 
-    <!-- СХЕМА 03: СТЕК И ТЕХНОЛОГИИ -->
+    <!-- РАЗДЕЛ: СТЕК -->
     <section id="stack" class="schema-section">
-      <div class="schema-badge">
-        <span class="badge-num">SCHEMA // 03</span>
-        <span class="badge-label" data-cipher>ТЕХНОЛОГИЧЕСКИЙ СТЕК</span>
+      <div class="section-title-wrap">
+        <h2 class="section-clean-title" data-cipher>СТЕК</h2>
       </div>
 
       <div class="stack-grid" id="stack-grid">
