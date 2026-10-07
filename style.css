@@ -912,37 +912,60 @@ body {
     width: 100%;
   }
 
+  /* ГОРИЗОНТАЛЬНЫЙ СВАЙП ПРОЕКТОВ (BENTO SWIPE) */
   .projects-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     gap: 14px;
+    padding: 4px 4px 18px;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .projects-grid::-webkit-scrollbar {
+    display: none;
   }
 
   .project-card {
-    padding: 18px 16px;
-    min-height: 160px;
+    flex: 0 0 84vw;
+    max-width: 330px;
+    scroll-snap-align: center;
+    padding: 20px 18px;
+    min-height: 180px;
+    border-radius: 20px;
+    background: rgba(14, 18, 25, 0.95);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   .project-name {
-    font-size: 16.5px;
+    font-size: 17px;
   }
 
   .project-body {
     font-size: 13px;
+    line-height: 1.5;
   }
 
   .stack-group-card {
-    padding: 18px 16px;
+    padding: 20px 18px;
+    border-radius: 20px;
   }
 
   .channel-card,
   .github-card,
   .quick-nav-card {
-    padding: 16px 16px;
+    padding: 18px 18px;
+    border-radius: 20px;
   }
 
   .channel-title,
   .github-title {
-    font-size: 16.5px;
+    font-size: 17px;
   }
 }
 

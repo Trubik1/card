@@ -216,6 +216,15 @@ function initStickerAutoCycle(CONFIG) {
   }
 }
 
+// ТАКТИЛЬНЫЙ ВИБРО-КЛИК (HAPTIC FEEDBACK)
+function triggerHaptic(duration = 16) {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    try {
+      navigator.vibrate(duration);
+    } catch (e) {}
+  }
+}
+
 // СКРОЛЛ-НАВИГАЦИЯ И АКТИВНЫЕ РАЗДЕЛЫ (SCROLL SPY)
 function initScrollNavigation() {
   const navTabs = document.querySelectorAll('.nav-tab');
@@ -231,11 +240,12 @@ function initScrollNavigation() {
     });
   }
 
-  // Плавный скролл по клику
+  // Плавный скролл по клику + тактильный вибро-клик
   function bindSmoothScroll(elements) {
     elements.forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
+        triggerHaptic(18);
         const targetId = el.getAttribute('data-target');
         const targetSection = document.getElementById(targetId);
         if (targetSection) {
@@ -363,9 +373,30 @@ function initInteractiveOmNom() {
       });
       if (shadow) shadow.style.transform = 'translate3d(0, 0, 0) scale(1)';
     });
+  // На смартфонах: реакция на гироскоп / наклон телефона (DeviceOrientation)
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      // gamma: наклон влево/вправо (-90 до 90)
+      // beta: наклон вперед/назад (-180 до 180)
+      const tiltX = Math.max(-14, Math.min(14, e.gamma * 0.45));
+      const tiltY = Math.max(-10, Math.min(10, (e.beta - 45) * 0.35));
+
+      img.style.transform = `perspective(600px) rotateY(${tiltX.toFixed(1)}deg) rotateX(${-tiltY.toFixed(1)}deg)`;
+
+      const pupilX = (tiltX / 14) * 8;
+      const pupilY = (tiltY / 10) * 8;
+      pupils.forEach(pupil => {
+        pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0)`;
+      });
+
+      if (shadow) {
+        shadow.style.transform = `translate3d(${-tiltX}px, 0, 0)`;
+      }
+    }, { passive: true });
   }
 
-  // При клике: смачный пружинистый squish + микровибрация
+  // При клике / тапе: смачный пружинистый squish + тактильный вибро-клик
   stage.addEventListener('click', () => {
     img.classList.remove('squish');
     if (eyesOverlay) eyesOverlay.classList.remove('squish');
@@ -375,48 +406,8 @@ function initInteractiveOmNom() {
     img.classList.add('squish');
     if (eyesOverlay) eyesOverlay.classList.add('squish');
 
-    if (navigator.vibrate) {
-      navigator.vibrate(15);
-    }
+    triggerHaptic(22);
   });
-}
-
-// CYBER HUD: ЖИВЫЕ ЧАСЫ UTC+3 И СЧЁТЧИК FPS
-function initCyberHud() {
-  const clockEl = document.getElementById('hud-clock');
-  const fpsEl = document.getElementById('hud-fps');
-
-  // Живые часы UTC+3
-  function updateTime() {
-    if (!clockEl) return;
-    const now = new Date();
-    // UTC+3 смещение
-    const utcHours = now.getUTCHours() + 3;
-    const hours = (utcHours % 24).toString().padStart(2, '0');
-    const minutes = now.getUTCMinutes().toString().padStart(2, '0');
-    clockEl.textContent = `UTC+3 ${hours}:${minutes}`;
-  }
-
-  updateTime();
-  setInterval(updateTime, 10000);
-
-  // Счётчик реального FPS
-  if (fpsEl) {
-    let frameCount = 0;
-    let lastTime = performance.now();
-
-    function fpsLoop(now) {
-      frameCount++;
-      if (now - lastTime >= 1000) {
-        const fps = Math.round((frameCount * 1000) / (now - lastTime));
-        fpsEl.textContent = `${Math.min(fps, 120)}`;
-        frameCount = 0;
-        lastTime = now;
-      }
-      requestAnimationFrame(fpsLoop);
-    }
-    requestAnimationFrame(fpsLoop);
-  }
 }
 
 // Защита от XSS
