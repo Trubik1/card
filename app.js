@@ -5,32 +5,60 @@
 document.addEventListener('DOMContentLoaded', () => {
   const CONFIG = window.CARD_CONFIG || {};
 
-  // 1. Инициализация фонового силового поля частиц (мышь, тачи, волны)
-  const bgCanvas = document.getElementById('bg-canvas');
-  if (bgCanvas && window.ParticleField && CONFIG.particles?.enabled !== false) {
-    new window.ParticleField(bgCanvas, {
-      spacing: CONFIG.particles?.gridDensity || 32,
-      radius: CONFIG.particles?.repulsionRadius || 110
-    });
+  // 1. Рендеринг данных (проекты, стек, био) — наивысший приоритет
+  try {
+    renderAllData(CONFIG);
+  } catch (e) {
+    console.error('renderAllData error:', e);
   }
 
-  // 2. Рендеринг данных (проекты, стек, био)
-  renderAllData(CONFIG);
+  // 2. Инициализация фонового силового поля частиц (мышь, тачи, волны)
+  try {
+    const bgCanvas = document.getElementById('bg-canvas');
+    if (bgCanvas && window.ParticleField && CONFIG.particles?.enabled !== false) {
+      new window.ParticleField(bgCanvas, {
+        spacing: CONFIG.particles?.gridDensity || 32,
+        radius: CONFIG.particles?.repulsionRadius || 110
+      });
+    }
+  } catch (e) {
+    console.error('ParticleField error:', e);
+  }
 
   // 3. Глобальный эффект дешифровки текста (Scramble Cipher)
-  runGlobalCipherCascade();
+  try {
+    runGlobalCipherCascade();
+  } catch (e) {
+    console.error('cipher cascade error:', e);
+  }
 
   // 4. Автосмена выбранных стикеров (стартовый #10, каждые 4 сек)
-  initStickerAutoCycle(CONFIG);
+  try {
+    initStickerAutoCycle(CONFIG);
+  } catch (e) {
+    console.error('sticker cycle error:', e);
+  }
 
   // 5. Навигация и скролл-шпион по схемам (Desktop + Mobile Dock)
-  initScrollNavigation();
+  try {
+    initScrollNavigation();
+  } catch (e) {
+    console.error('scroll navigation error:', e);
+  }
 
   // 6. Интерактивный 3D-Tilt наклон карточек со световым бликом (Spotlight)
-  init3DTiltAndSpotlights();
+  try {
+    init3DTiltAndSpotlights();
+  } catch (e) {
+    console.error('3D tilt error:', e);
+  }
 
   // 7. Интерактивный Ом Ням: слежение за курсором и упругий Squish
-  initInteractiveOmNom();
+  try {
+    initInteractiveOmNom();
+  } catch (e) {
+    console.error('om nom error:', e);
+  }
 });
 
 // РЕНДЕРИНГ ДАННЫХ
@@ -373,6 +401,8 @@ function initInteractiveOmNom() {
       });
       if (shadow) shadow.style.transform = 'translate3d(0, 0, 0) scale(1)';
     });
+  }
+
   // На смартфонах: реакция на гироскоп / наклон телефона (DeviceOrientation)
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', (e) => {
