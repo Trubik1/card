@@ -4,7 +4,7 @@
 
 window.CARD_CONFIG = {
   // Имя и заголовок
-  name: "Trubik",
+  name: "Trubik (Trubik1)",
   tagline: "ML Engineer & Fullstack Developer",
   bio: "Разработка систем компьютерного зрения, обучающих платформ с ИИ, Telegram-ботов и масштабируемых веб-приложений. Фокус на производительность и надёжность.",
   
