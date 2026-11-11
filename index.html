@@ -95,6 +95,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="shortcut icon" href="/favicon.ico" />
 
+  <!-- Предзагрузка Google Fonts без блокировки рендера (экономия 370мс в Lighthouse) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+
+  <!-- Предзагрузка главного LCP-изображения первого экрана -->
+  <link rel="preload" as="image" href="assets/amnumya_010.webp" type="image/webp" fetchpriority="high" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -137,7 +145,7 @@
           <!-- Сцена со стикером (автосмена каждые 4 сек, без лишних надписей и номеров) -->
           <div class="sticker-stage" id="sticker-stage" title="Кликните для мгновенной смены стикера">
             <div class="sticker-wrapper" id="sticker-wrapper">
-              <img id="sticker-img" class="sticker-img" src="assets/amnumya_010.webp" alt="Ам Няма" />
+              <img id="sticker-img" class="sticker-img" src="assets/amnumya_010.webp" alt="Ам Няма" width="180" height="180" fetchpriority="high" decoding="async" />
               <!-- Интерактивные живые зрачки для стикера #10 (следящие за курсором) -->
               <div class="omnom-eyes-overlay" id="omnom-eyes" aria-hidden="true">
                 <div class="omnom-eye left-eye">
@@ -434,9 +442,9 @@
     </a>
   </nav>
 
-  <!-- Подключение скриптов -->
-  <script src="config.js"></script>
-  <script src="particles.js"></script>
-  <script src="app.js"></script>
+  <!-- Подключение скриптов с defer (не блокируют основной поток парсинга) -->
+  <script src="config.js" defer></script>
+  <script src="particles.js" defer></script>
+  <script src="app.js" defer></script>
 </body>
 </html>

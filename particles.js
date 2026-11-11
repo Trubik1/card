@@ -85,11 +85,10 @@ class ParticleField {
       resizeTimer = setTimeout(() => this.resize(), 120);
     });
 
-    // Десктоп: движение мыши
+    // Десктоп: движение мыши (без вызова getBoundingClientRect для нулевого reflow)
     window.addEventListener('pointermove', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      this.mouse.x = e.clientX - rect.left;
-      this.mouse.y = e.clientY - rect.top;
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
       this.mouse.active = true;
     }, { passive: true });
 
@@ -101,12 +100,9 @@ class ParticleField {
 
     // Мобильные: касания и импульсные волны
     const addRipple = (clientX, clientY) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
       this.touchRipples.push({
-        x,
-        y,
+        x: clientX,
+        y: clientY,
         radius: 10,
         maxRadius: 180,
         strength: 5.5,

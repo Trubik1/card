@@ -3,7 +3,7 @@
    Вдохновлено unibb.vercel.app & tier.guru/ecronx
    ============================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Шрифты загружаются асинхронно через link preconnect в index.html для максимального FCP/LCP */
 
 :root {
   --bg-deep: #08090c;

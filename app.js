@@ -311,6 +311,7 @@ function init3DTiltAndSpotlights() {
   const cards = document.querySelectorAll('.cyber-frame');
   cards.forEach(card => {
     let bounds;
+    let rafId = null;
 
     function onMouseEnter() {
       bounds = card.getBoundingClientRect();
@@ -318,32 +319,41 @@ function init3DTiltAndSpotlights() {
 
     function onMouseMove(e) {
       if (!bounds) bounds = card.getBoundingClientRect();
-      const mouseX = e.clientX - bounds.left;
-      const mouseY = e.clientY - bounds.top;
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (!bounds) return;
+        const mouseX = e.clientX - bounds.left;
+        const mouseY = e.clientY - bounds.top;
 
-      // Позиция для радиального светового пятна
-      card.style.setProperty('--mouse-x', `${mouseX}px`);
-      card.style.setProperty('--mouse-y', `${mouseY}px`);
+        // Позиция для радиального светового пятна
+        card.style.setProperty('--mouse-x', `${mouseX}px`);
+        card.style.setProperty('--mouse-y', `${mouseY}px`);
 
-      // 3D Tilt физика: вычисляем угол наклона (от -4.5deg до +4.5deg)
-      const centerX = bounds.width / 2;
-      const centerY = bounds.height / 2;
-      const rotateX = ((mouseY - centerY) / centerY) * -4.5;
-      const rotateY = ((mouseX - centerX) / centerX) * 4.5;
+        // 3D Tilt физика: вычисляем угол наклона (от -4.5deg до +4.5deg)
+        const centerX = bounds.width / 2;
+        const centerY = bounds.height / 2;
+        const rotateX = ((mouseY - centerY) / centerY) * -4.5;
+        const rotateY = ((mouseX - centerX) / centerX) * 4.5;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+      });
     }
 
     function onMouseLeave() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
       card.style.setProperty('--mouse-x', `-500px`);
       card.style.setProperty('--mouse-y', `-500px`);
       bounds = null;
     }
 
-    card.addEventListener('mouseenter', onMouseEnter);
-    card.addEventListener('mousemove', onMouseMove);
-    card.addEventListener('mouseleave', onMouseLeave);
+    card.addEventListener('mouseenter', onMouseEnter, { passive: true });
+    card.addEventListener('mousemove', onMouseMove, { passive: true });
+    card.addEventListener('mouseleave', onMouseLeave, { passive: true });
   });
 }
 
@@ -356,85 +366,105 @@ function initInteractiveOmNom() {
   const shadow = document.getElementById('sticker-shadow');
   if (!stage || !img) return;
 
-  // Глобальное слежение за курсором мыши по всему экрану
+  // Кэшируем координаты сцены для исключения Forced Reflow (Принудительной компоновки)
+  let stageCenterX = 0;
+  let stageCenterY = 0;
+  function updateStageCenter() {
+    const rect = stage.getBoundingClientRect();
+    stageCenterX = rect.left + rect.width / 2;
+    stageCenterY = rect.top + rect.height / 2;
+  }
+  updateStageCenter();
+  window.addEventListener('resize', updateStageCenter, { passive: true });
+  window.addEventListener('scroll', updateStageCenter, { passive: true });
+
+  // Глобальное слежение за курсором мыши через requestAnimationFrame
   if (!window.matchMedia('(hover: none)').matches) {
+    let mouseRaf = null;
+
     window.addEventListener('mousemove', (e) => {
-      const rect = stage.getBoundingClientRect();
-      const stageCenterX = rect.left + rect.width / 2;
-      const stageCenterY = rect.top + rect.height / 2;
+      if (mouseRaf) return;
+      mouseRaf = requestAnimationFrame(() => {
+        mouseRaf = null;
+        // Вектор от центра Ам Няма до курсора (без синхронного getBoundingClientRect)
+        const dx = e.clientX - stageCenterX;
+        const dy = e.clientY - stageCenterY;
+        const dist = Math.hypot(dx, dy);
 
-      // Вектор от центра Ам Няма до курсора
-      const dx = e.clientX - stageCenterX;
-      const dy = e.clientY - stageCenterY;
-      const dist = Math.hypot(dx, dy);
+        // 1. Поворот и наклон тела Ам Няма в направлении курсора
+        const maxAngle = 14;
+        const angleX = Math.max(-maxAngle, Math.min(maxAngle, (dx / (window.innerWidth || 1)) * 28));
+        const angleY = Math.max(-10, Math.min(10, (dy / (window.innerHeight || 1)) * 16));
+        img.style.transform = `perspective(600px) rotateY(${angleX.toFixed(1)}deg) rotateX(${-angleY.toFixed(1)}deg)`;
 
-      // 1. Поворот и наклон тела Ам Няма в направлении курсора
-      const maxAngle = 14;
-      const angleX = Math.max(-maxAngle, Math.min(maxAngle, (dx / window.innerWidth) * 28));
-      const angleY = Math.max(-10, Math.min(10, (dy / window.innerHeight) * 16));
-      img.style.transform = `perspective(600px) rotateY(${angleX.toFixed(1)}deg) rotateX(${-angleY.toFixed(1)}deg)`;
+        // 2. Движение зрачков внутри глазниц (макс радиус движения 10px)
+        const maxPupilMove = 10;
+        const pRatio = Math.min(1, dist / 400);
+        const angleRad = Math.atan2(dy, dx);
+        const pupilX = Math.cos(angleRad) * maxPupilMove * pRatio;
+        const pupilY = Math.sin(angleRad) * maxPupilMove * pRatio;
 
-      // 2. Движение зрачков внутри глазниц (макс радиус движения 10px)
-      const maxPupilMove = 10;
-      const pRatio = Math.min(1, dist / 400);
-      const angleRad = Math.atan2(dy, dx);
-      const pupilX = Math.cos(angleRad) * maxPupilMove * pRatio;
-      const pupilY = Math.sin(angleRad) * maxPupilMove * pRatio;
+        pupils.forEach(pupil => {
+          const scale = dist < 220 ? 1.25 : 1.0;
+          pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0) scale(${scale})`;
+        });
 
-      pupils.forEach(pupil => {
-        // Эффект расширения зрачков при приближении курсора (любопытство)
-        const scale = dist < 220 ? 1.25 : 1.0;
-        pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0) scale(${scale})`;
+        // 3. Смещение тени
+        if (shadow) {
+          shadow.style.transform = `translate3d(${-angleX * 1.2}px, 0, 0) scale(${1 - Math.abs(angleX) * 0.01})`;
+        }
       });
-
-      // 3. Смещение тени в противоположную сторону от наклона
-      if (shadow) {
-        shadow.style.transform = `translate3d(${-angleX * 1.2}px, 0, 0) scale(${1 - Math.abs(angleX) * 0.01})`;
-      }
-    });
+    }, { passive: true });
 
     // Плавный возврат в центр при уходе мыши с окна
     window.addEventListener('mouseleave', () => {
+      if (mouseRaf) {
+        cancelAnimationFrame(mouseRaf);
+        mouseRaf = null;
+      }
       img.style.transform = 'perspective(600px) rotateY(0deg) rotateX(0deg)';
       pupils.forEach(p => {
         p.style.transform = 'translate3d(0, 0, 0) scale(1)';
       });
       if (shadow) shadow.style.transform = 'translate3d(0, 0, 0) scale(1)';
-    });
+    }, { passive: true });
   }
 
   // На смартфонах: реакция на гироскоп / наклон телефона (DeviceOrientation)
   if (window.DeviceOrientationEvent) {
+    let gyroRaf = null;
     window.addEventListener('deviceorientation', (e) => {
       if (e.gamma === null || e.beta === null) return;
-      // gamma: наклон влево/вправо (-90 до 90)
-      // beta: наклон вперед/назад (-180 до 180)
-      const tiltX = Math.max(-14, Math.min(14, e.gamma * 0.45));
-      const tiltY = Math.max(-10, Math.min(10, (e.beta - 45) * 0.35));
+      if (gyroRaf) return;
+      gyroRaf = requestAnimationFrame(() => {
+        gyroRaf = null;
+        const tiltX = Math.max(-14, Math.min(14, e.gamma * 0.45));
+        const tiltY = Math.max(-10, Math.min(10, (e.beta - 45) * 0.35));
 
-      img.style.transform = `perspective(600px) rotateY(${tiltX.toFixed(1)}deg) rotateX(${-tiltY.toFixed(1)}deg)`;
+        img.style.transform = `perspective(600px) rotateY(${tiltX.toFixed(1)}deg) rotateX(${-tiltY.toFixed(1)}deg)`;
 
-      const pupilX = (tiltX / 14) * 8;
-      const pupilY = (tiltY / 10) * 8;
-      pupils.forEach(pupil => {
-        pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0)`;
+        const pupilX = (tiltX / 14) * 8;
+        const pupilY = (tiltY / 10) * 8;
+        pupils.forEach(pupil => {
+          pupil.style.transform = `translate3d(${pupilX.toFixed(1)}px, ${pupilY.toFixed(1)}px, 0)`;
+        });
+
+        if (shadow) {
+          shadow.style.transform = `translate3d(${-tiltX}px, 0, 0)`;
+        }
       });
-
-      if (shadow) {
-        shadow.style.transform = `translate3d(${-tiltX}px, 0, 0)`;
-      }
     }, { passive: true });
   }
 
-  // При клике / тапе: смачный пружинистый squish + тактильный вибро-клик
+  // При клике / тапе: смачный пружинистый squish без синхронного forced reflow
   stage.addEventListener('click', () => {
     img.classList.remove('squish');
     if (eyesOverlay) eyesOverlay.classList.remove('squish');
     
-    // Force reflow
-    void img.offsetWidth;
-    img.classList.add('squish');
-    if (eyesOverlay) eyesOverlay.classList.add('squish');
+    requestAnimationFrame(() => {
+      img.classList.add('squish');
+      if (eyesOverlay) eyesOverlay.classList.add('squish');
+    });
 
     triggerHaptic(22);
   });
